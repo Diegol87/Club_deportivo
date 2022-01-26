@@ -5,7 +5,7 @@ const url = require('url')
 const server = http
     .createServer((req, res) => {
         if(req.url === '/') {
-            res.writeHead(200, { 'Content-Type' : 'text/html' })
+            res.setHeader('Content-Type', 'text/html')
             fs.readFile('index.html', 'utf8', (err, data) => {
                 res.end(data)
             })
@@ -20,10 +20,10 @@ const server = http
                 precio,
             }
 
-            const dato = JSON.parse(fs.readFileSync('deportes.json', 'utf8'))
-            dato.deportes.push(deporte)
+            const data = JSON.parse(fs.readFileSync('deportes.json', 'utf8'))
+            data.deportes.push(deporte)
 
-            fs.writeFile('deportes.json', JSON.stringify(dato), (err) => {
+            fs.writeFile('deportes.json', JSON.stringify(data), (err) => {
                 if(err) return res.end('Error al momento de intentar el registro 😢')
                 res.end('Registro con exito 😎'  )
             })
@@ -31,7 +31,7 @@ const server = http
 
         //Crear una ruta que al consultarse devuelva en formato JSON todos los deportes registrados
 
-        if(req.url.includes('/deportes')) {
+        if(req.url === '/deportes') {
             fs.readFile('deportes.json', 'utf8', (err, data) => {
                 if(err) return res.end('Error al momento de buscar el listado de deportes 😢')
                 res.end(data)
@@ -42,9 +42,9 @@ const server = http
 
         if(req.url.includes('/editar')) {
             const { nombre, precio } = url.parse(req.url, true).query
-            const dato = JSON.parse(fs.readFileSync('deportes.json', 'utf8'))
+            const data = JSON.parse(fs.readFileSync('deportes.json', 'utf8'))
 
-            nuevoDeporte = dato.deportes.map((dep) => {
+            nuevoDeporte = data.deportes.map((dep) => {
                 if(dep.nombre === nombre) {
                     dep.precio = precio
                 }
@@ -65,10 +65,10 @@ const server = http
 
         if(req.url.includes('/eliminar')) {
             const { nombre } = url.parse(req.url, true).query
-            const dato = JSON.parse(fs.readFileSync('deportes.json', 'utf8'))
+            const data = JSON.parse(fs.readFileSync('deportes.json', 'utf8'))
             if(!nombre) return res.end('El nombre no es válido 😢')
 
-            nuevoDeporte = dato.deportes.filter((dep) => dep.nombre !== nombre)
+            nuevoDeporte = data.deportes.filter((dep) => dep.nombre !== nombre)
 
             const nuevoDato = {
                 deportes: nuevoDeporte,
